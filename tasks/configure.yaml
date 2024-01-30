@@ -1,0 +1,56 @@
+---
+- name: configuring
+  become: yes
+  become_user: "{{ item.user }}"
+  block:
+    - name: get user home directory path
+      shell: "echo $HOME"
+      register: _user_home
+      changed_when: false
+      check_mode: no
+
+    - name: make host configuration dir
+      file:
+        path: "{{ _user_home.stdout }}/.ssh/corkscrew.d"
+        state: directory
+        mode: 0700
+
+    - name: add corkscrew configuration for as including to user ssh config
+      blockinfile:
+        path: "{{ _user_home.stdout }}/.ssh/config"
+        state: present
+        insertafter: EOF
+        create: true
+        mode: 0600
+        marker: "# {mark} CORKSCREW ANSIBLE MANAGED BLOCK"
+        block: |
+          Include corkscrew.d/*
+
+    - name: add proxy credentials file
+      copy:
+        content: "{{ item_hosts.proxy_user }}:{{ item_hosts.proxy_password }}"
+        dest: "{{ _user_home.stdout }}/.ssh/{{ item_hosts.name }}-proxy-auth.conf"
+        state: present
+        create: true
+        mode: 0600
+      when: item_hosts.proxy_password is defined and item_hosts.proxy_password | length > 0
+      loop: "{{ item.hosts }}"
+      loop_control:
+        loop_var: item_hosts
+
+    - name: add corkscrew ssh host config
+      blockinfile:
+        path: "{{ _user_home.stdout }}/.ssh/corkscrew.d/{{ item_hosts.name }}"
+        state: present
+        insertafter: EOF
+        create: true
+        mode: 0600
+        marker: "# {mark} CORKSCREW ANSIBLE MANAGED BLOCK"
+        block: |
+          Host {{ item_hosts.name }} 
+               Hostname {{ item_hosts.name }} 
+               ForwardAgent {% if item_hosts.forward_agent is defined and item_hosts.forward_agent == 'no' %}no{% else %}yes{% endif %} 
+               ProxyCommand {{ corkscrew_execute_path }} {{ item_hosts.proxy_addr }} {{ item_hosts.proxy_port }} %h %p {% if item_hosts.proxy_password is defined and item_hosts.proxy_password | length > 0 %}{{ _user_home.stdout }}/.ssh/{{ item_hosts.name }}-proxy-auth.conf{% endif %}
+      loop: "{{ item.hosts }}"
+      loop_control:
+        loop_var: item_hosts

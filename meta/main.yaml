@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: corkscrew
+  author: YouSysAdmin
+  description: Install corkscrew
+  company: YouSysAdmin
+
+  license: GPLv3
+
+  min_ansible_version: 2.4
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+
+  galaxy_tags:
+    - corkscrew
+    - ssh
+    - proxy
+
+dependencies: []

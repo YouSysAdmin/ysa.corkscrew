@@ -1,0 +1,5 @@
+- name: APT install corkscrew package
+  apt:
+    name: "{{ corkscrew_apt_pkg_name }}"
+    state: latest
+    update_cache: true

@@ -1,0 +1,13 @@
+---
+corkscrew_apt_pkg_name: corkscrew
+
+corkscrew_execute_path: '/usr/bin/corkscrew'
+corkscrew_config: []
+#  - user: ubuntu
+#    hosts:
+#      - name: 'github.com' # git server hostname
+#        proxy_addr: 127.0.0.1 # proxy server addr
+#        proxy_port: 8080 # proxy server port
+#        forward_agent: yes # OPTIONAL: forward ssh agent (default: yes)
+#        proxy_user: '' # OPTIONAL: proxy server user (default: '')
+#        proxy_password: '' # OPTIONAL: proxy server password (default: '')

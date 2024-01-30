@@ -1,0 +1,7 @@
+---
+- include_tasks: install.yaml
+  when: corkscrew_config | length > 0
+
+- include_tasks: configure.yaml
+  with_items: "{{ corkscrew_config }}"
+  when: corkscrew_config | length > 0
